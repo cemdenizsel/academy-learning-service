@@ -309,7 +309,9 @@ class PullCoinMarketCapBehaviour(LearningBaseBehaviour):  # pylint: disable=too-
 
 
             # Store the price in IPFS
-            #value_ipfs_hash = yield from self.send_price_to_ipfs(value)
+            value_ipfs_hash = yield from self.send_fear_greed_value_to_ipfs(value)
+            print("THE GREED AND FEAR VALUE IPFS HASH IS: ", value_ipfs_hash)
+
 
             # Get the native balance
             #native_balance = yield from self.get_native_balance()
@@ -322,7 +324,7 @@ class PullCoinMarketCapBehaviour(LearningBaseBehaviour):  # pylint: disable=too-
             payload = PullCoinMarketCapPayload(
                 sender=sender,
                 value=value,
-                #value_ipfs_hash=value_ipfs_hash,
+                value_ipfs_hash=value_ipfs_hash,
                 #native_balance=native_balance,
                 #erc20_balance=erc20_balance,
             )
@@ -379,16 +381,16 @@ class PullCoinMarketCapBehaviour(LearningBaseBehaviour):  # pylint: disable=too-
         self.context.logger.info(f"Got Fear and Greed index from CoinMarketCap: {value}")
         return value
 
-    def send_price_to_ipfs(self, price) -> Generator[None, None, Optional[str]]:
+    def send_fear_greed_value_to_ipfs(self, value) -> Generator[None, None, Optional[str]]:
         """Store the token price in IPFS"""
-        data = {"price": price}
-        price_ipfs_hash = yield from self.send_to_ipfs(
+        data = {"fear & greed value": value}
+        value_ipfs_hash = yield from self.send_to_ipfs(
             filename=self.metadata_filepath, obj=data, filetype=SupportedFiletype.JSON
         )
         self.context.logger.info(
-            f"Price data stored in IPFS: https://gateway.autonolas.tech/ipfs/{price_ipfs_hash}"
+            f"FEAR & GREED VALUE stored in IPFS: https://gateway.autonolas.tech/ipfs/{value_ipfs_hash}"
         )
-        return price_ipfs_hash
+        return value_ipfs_hash
 
     def get_erc20_balance(self) -> Generator[None, None, Optional[float]]:
         """Get ERC20 balance"""
@@ -497,6 +499,11 @@ class DecisionMakingBehaviour(
         token_price = self.synchronized_data.price
         token_price = yield from self.get_price_from_ipfs()
 
+        fear_greed_value = self.synchronized_data.value_ipfs_hash
+        fear_greed_value = yield from self.get_value_from_ipfs()
+
+        print("FEAR & GREED VALUE FROM IPFS: ", fear_greed_value )
+
         # If we fail to get the block number, we send the ERROR event
         if not block_number:
             self.context.logger.info("Block number is None. Sending the ERROR event...")
@@ -560,6 +567,15 @@ class DecisionMakingBehaviour(
         )
         self.context.logger.error(f"Got price from IPFS: {price}")
         return price
+    
+    def get_value_from_ipfs(self) -> Generator[None, None, Optional[dict]]:
+        """Load the price data from IPFS"""
+        ipfs_hash = self.synchronized_data.value_ipfs_hash
+        value = yield from self.get_from_ipfs(
+            ipfs_hash=ipfs_hash, filetype=SupportedFiletype.JSON
+        )
+        self.context.logger.error(f"Got feer & greed value from IPFS: {value}")
+        return value
 
 
 class TxPreparationBehaviour(
