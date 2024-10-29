@@ -37,6 +37,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    ExerciseTxPreparationPayload,
     PullCoinMarketCapPayload,
     TxPreparationPayload,
 )
@@ -197,6 +198,18 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class ExerciseTxPreparationRound(CollectSameUntilThresholdRound):
+    """TxPreparationRound"""
+
+    payload_class = ExerciseTxPreparationPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_tx_round)
+    selection_key = (
+        get_name(SynchronizedData.tx_submitter),
+        get_name(SynchronizedData.most_voted_tx_hash),
+    )
 
 class FinishedDecisionMakingRound(DegenerateRound):
     """FinishedDecisionMakingRound"""
@@ -229,11 +242,16 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
             Event.ERROR: FinishedDecisionMakingRound,
-            Event.TRANSACT: TxPreparationRound,
+            Event.TRANSACT: ExerciseTxPreparationRound,
         },
-        TxPreparationRound: {
-            Event.NO_MAJORITY: TxPreparationRound,
-            Event.ROUND_TIMEOUT: TxPreparationRound,
+        # TxPreparationRound: {
+        #     Event.NO_MAJORITY: TxPreparationRound,
+        #     Event.ROUND_TIMEOUT: TxPreparationRound,
+        #     Event.DONE: FinishedTxPreparationRound,
+        # },
+         ExerciseTxPreparationRound: {
+            Event.NO_MAJORITY: ExerciseTxPreparationRound,
+            Event.ROUND_TIMEOUT: ExerciseTxPreparationRound,
             Event.DONE: FinishedTxPreparationRound,
         },
         FinishedDecisionMakingRound: {},
