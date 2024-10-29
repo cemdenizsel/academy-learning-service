@@ -37,6 +37,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    PullCoinMarketCapPayload,
     TxPreparationPayload,
 )
 
@@ -127,6 +128,29 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class PullCoinMarketCapRound(CollectSameUntilThresholdRound):
+    """DataPullRound"""
+
+    payload_class = PullCoinMarketCapPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+
+    # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
+    collection_key = get_name(SynchronizedData.participant_to_data_round)
+
+    # Selection key specifies how to extract all the different objects from each agent's payload
+    # and where to store it in the synchronized data. Notice that the order follows the same order
+    # from the payload class.
+    selection_key = (
+        get_name(SynchronizedData.price),
+        get_name(SynchronizedData.price_ipfs_hash),
+        get_name(SynchronizedData.native_balance),
+        get_name(SynchronizedData.erc20_balance),
+    )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
 
 class DecisionMakingRound(CollectSameUntilThresholdRound):
     """DecisionMakingRound"""
@@ -186,6 +210,11 @@ class LearningAbciApp(AbciApp[Event]):
     }
     transition_function: AbciAppTransitionFunction = {
         DataPullRound: {
+            Event.NO_MAJORITY: DataPullRound,
+            Event.ROUND_TIMEOUT: DataPullRound,
+            Event.DONE: PullCoinMarketCapRound,
+        },
+        PullCoinMarketCapRound: {
             Event.NO_MAJORITY: DataPullRound,
             Event.ROUND_TIMEOUT: DataPullRound,
             Event.DONE: DecisionMakingRound,
