@@ -34,6 +34,15 @@ class DataPullPayload(BaseTxPayload):
     native_balance: Optional[float]
     erc20_balance: Optional[float]
 
+@dataclass(frozen=True)
+class PullCoinMarketCapPayload(BaseTxPayload):
+    """Represent a transaction payload for the DataPullRound."""
+
+    value: Optional[float]
+    value_ipfs_hash: Optional[str]
+    #native_balance: Optional[float]
+    #erc20_balance: Optional[float]
+
 
 @dataclass(frozen=True)
 class DecisionMakingPayload(BaseTxPayload):
@@ -45,6 +54,13 @@ class DecisionMakingPayload(BaseTxPayload):
 @dataclass(frozen=True)
 class TxPreparationPayload(BaseTxPayload):
     """Represent a transaction payload for the TxPreparationRound."""
+
+    tx_submitter: Optional[str] = None
+    tx_hash: Optional[str] = None
+
+@dataclass(frozen=True)
+class ExerciseTxPreparationPayload(BaseTxPayload):
+    """Represent a transaction payload for the ExerciseTxPreparationRound."""
 
     tx_submitter: Optional[str] = None
     tx_hash: Optional[str] = None

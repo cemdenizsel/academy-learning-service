@@ -50,7 +50,12 @@ class Params(BaseParams):
         self.coingecko_price_template = self._ensure(
             "coingecko_price_template", kwargs, str
         )
+        # self.coinmarketcap_price_template = self._ensure(
+        #     "coinmarketcap_price_template", kwargs, str
+        # )
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
+        self.coinmarketcap_api_key = kwargs.get("coinmarketcap_api_key", None)
+
         self.transfer_target_address = self._ensure(
             "transfer_target_address", kwargs, str
         )
@@ -64,3 +69,6 @@ class Params(BaseParams):
 
 class CoingeckoSpecs(ApiSpecs):
     """A model that wraps ApiSpecs for Coingecko API."""
+
+class CoinmarketcapSpecs(ApiSpecs):
+    """A model that wraps ApiSpecs for Coinmarketcap API."""
