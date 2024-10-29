@@ -34,6 +34,15 @@ class DataPullPayload(BaseTxPayload):
     native_balance: Optional[float]
     erc20_balance: Optional[float]
 
+@dataclass(frozen=True)
+class PullCoinMarketCapPayload(BaseTxPayload):
+    """Represent a transaction payload for the DataPullRound."""
+
+    value: Optional[float]
+    value_ipfs_hash: Optional[str]
+    #native_balance: Optional[float]
+    #erc20_balance: Optional[float]
+
 
 @dataclass(frozen=True)
 class DecisionMakingPayload(BaseTxPayload):
