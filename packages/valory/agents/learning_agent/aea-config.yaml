@@ -20,6 +20,7 @@ contracts:
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 - valory/service_registry:0.1.0:bafybeihafe524ilngwzavkhwz4er56p7nyar26lfm7lrksfiqvvzo3kdcq
 - valory/erc20:0.1.0:bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi
+- valory/oracle:0.1.0:bafybeielvzh6nshinxbxr4kj4wi56pliiluajopfhpbjy2r3iaml4rlihm
 protocols:
 - open_aea/signing:1.0.0:bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi
 - valory/abci:0.1.0:bafybeiaqmp7kocbfdboksayeqhkbrynvlfzsx4uy4x6nohywnmaig4an7u
@@ -32,8 +33,8 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeidz54kvxhbdmpruzguuzzq7bjg4pekjb5amqobkxoy4oqknnobopu
 - valory/abstract_round_abci:0.1.0:bafybeiajjzuh6vf23crp55humonknirvv2f4s3dmdlfzch6tc5ow52pcgm
-- valory/learning_abci:0.1.0:bafybeihyxi5hpye2pkjx2nvnlr6uvo662cyjzyb2n7nfr35mf34s4zvdca
-- valory/learning_chained_abci:0.1.0:bafybeihqgdsullhjg544745gdc4qjt5bdxvk7m7l3c5gutchuaepq65a24
+- valory/learning_abci:0.1.0:bafybeihdl7r624ge322tjh35buqcj5myany2zkz2pt3tx64ewlk6t2uwxu
+- valory/learning_chained_abci:0.1.0:bafybeigri5sd5mksuyi4fji5jfynbvgxs7qsw2prcw33sfk6yzjoi6evey
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi
@@ -206,6 +207,7 @@ models:
       termination_from_block: ${int:34088325}
       transfer_target_address: ${str:0x0000000000000000000000000000000000000000}
       olas_token_address: ${str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
+      dai_oracle_address: ${str:0x678df3415fc31947dA4324eC63212874be5a82f8}
   coingecko_specs:
     args:
       api_id: coingecko

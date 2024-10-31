@@ -25,6 +25,7 @@ from pathlib import Path
 from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
 
+from packages.valory.contracts.oracle.contract import Oracle
 from packages.valory.contracts.erc20.contract import ERC20
 from packages.valory.contracts.gnosis_safe.contract import (
     GnosisSafeContract,
@@ -316,10 +317,10 @@ class PullCoinMarketCapBehaviour(LearningBaseBehaviour):  # pylint: disable=too-
 
 
             # Get the native balance
-            #native_balance = yield from self.get_native_balance()
+            native_balance = yield from self.get_native_balance()
 
             # Get the token balance
-            #erc20_balance = yield from self.get_erc20_balance()
+            erc20_balance = yield from self.get_erc20_balance()
 
             # Prepare the payload to be shared with other agents
             # After consensus, all the agents will have the same price, price_ipfs_hash and balance variables in their synchronized data
@@ -883,17 +884,17 @@ class ExerciseTxPreparationBehaviour(
         # Again, make a decision based on the timestamp (on its last number)
         now = int(self.get_sync_timestamp())
         self.context.logger.info(f"Timestamp is {now}")
-        last_number = int(str(now)[-1])
-
+        latest_price_of_dai = yield from self.get_price_dai_from_oracle()
+        latest_price_of_dai = int(latest_price_of_dai)
+        print("!!!!  latest_price_of DAI is: ", latest_price_of_dai)
+        tx_amount = 1
         # Native transaction (Safe -> recipient)
-        if last_number in [0, 1, 2, 3]:
-            self.context.logger.info("Preparing a native transaction with amount 2")
-            tx_hash = yield from self.get_native_transfer_safe_tx_hash(2)
-            return tx_hash
+        if latest_price_of_dai < 1:
+            tx_amount = tx_amount + 2 
         else:
-            self.context.logger.info("Preparing a native transaction with amount 1")
-            tx_hash = yield from self.get_native_transfer_safe_tx_hash(1)
-            return tx_hash
+            tx_amount = tx_amount + 1
+        tx_hash = yield from self.get_native_transfer_safe_tx_hash(tx_amount)
+        return tx_hash
 
         # # ERC20 transaction (Safe -> recipient)
         # if last_number in [4, 5, 6]:
@@ -905,6 +906,74 @@ class ExerciseTxPreparationBehaviour(
         # self.context.logger.info("Preparing a multisend transaction")
         # tx_hash = yield from self.get_multisend_safe_tx_hash()
         # return tx_hash
+    
+    def get_price_dai_from_oracle(self) -> Generator[None, None, Optional[float]]:
+        """Get DAI price"""
+        self.context.logger.info(
+            f"Getting Dai balance for Safe {self.synchronized_data.safe_contract_address}"
+        )
+
+        # Use the contract api to interact with the ERC20 contract
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.dai_oracle_address,
+            contract_id=str(Oracle.contract_id),
+            contract_callable="get_latest_answer",
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check that the response is what we expect
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the latest price of DAI: {response_msg}"
+            )
+            return None
+
+        latest_price_of_dai = response_msg.raw_transaction.body.get("answer", None)
+
+        # Ensure that the balance is not None
+        if latest_price_of_dai is None:
+            self.context.logger.error(
+                f"Error while retrieving the latest_price_of_dai:  {response_msg}"
+            )
+            return None
+        
+        print("!!!! RAW latest_price_of DAI is: ", latest_price_of_dai)
+        latest_price_of_dai = latest_price_of_dai / 1e8 #10**18  # from wei
+
+        self.context.logger.info(
+            f"Account {self.synchronized_data.safe_contract_address} has {latest_price_of_dai} DAI"
+        )
+        return latest_price_of_dai
+    
+
+
+    def get_native_balance(self) -> Generator[None, None, Optional[float]]:
+        """Get the native balance"""
+        self.context.logger.info(
+            f"Getting native balance for Safe {self.synchronized_data.safe_contract_address}"
+        )
+
+        ledger_api_response = yield from self.get_ledger_api_response(
+            performative=LedgerApiMessage.Performative.GET_STATE,
+            ledger_callable="get_balance",
+            account=self.synchronized_data.safe_contract_address,
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        if ledger_api_response.performative != LedgerApiMessage.Performative.STATE:
+            self.context.logger.error(
+                f"Error while retrieving the native balance: {ledger_api_response}"
+            )
+            return None
+
+        balance = cast(int, ledger_api_response.state.body["get_balance_result"])
+        balance = balance / 10**18  # from wei
+
+        self.context.logger.error(f"Got native balance: {balance}")
+
+        return balance
+    
 
     def get_native_transfer_safe_tx_hash(self, amount:int) -> Generator[None, None, Optional[str]]:
         """Prepare a native safe transaction"""
