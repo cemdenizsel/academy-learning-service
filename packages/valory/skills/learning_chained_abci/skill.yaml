@@ -22,7 +22,7 @@ skills:
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi
-- valory/learning_abci:0.1.0:bafybeihdl7r624ge322tjh35buqcj5myany2zkz2pt3tx64ewlk6t2uwxu
+- valory/learning_abci:0.1.0:bafybeihiq7t6qyajakretnf2b5pddoeyobnsznfcsoo4bly22oajy27zvu
 - valory/transaction_settlement_abci:0.1.0:bafybeielv6eivt2z6nforq43xewl2vmpfwpdu2s2vfogobziljnwsclmlm
 behaviours:
   main:
@@ -141,6 +141,7 @@ models:
       transfer_target_address: '0x0000000000000000000000000000000000000000'
       olas_token_address: '0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f'
       dai_oracle_address: '0x678df3415fc31947dA4324eC63212874be5a82f8'
+      price_keeper_address: '0xf8caa9B06000f167f2b5Cb0333CE7152E0560225'
     class_name: Params
   coingecko_specs:
     args:

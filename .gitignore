@@ -13,11 +13,6 @@ learning_service
 packages/valory/agents/*
 packages/valory/connections/*
 packages/valory/contracts/*
-# packages/valory/contracts/erc20
-# packages/valory/contracts/gnosis_safe
-# packages/valory/contracts/gnosis_safe_proxy_factory
-# packages/valory/contracts/service_registry
-# packages/valory/contracts/multisend
 packages/valory/services/*
 packages/valory/protocols/*
 packages/valory/skills/*
@@ -28,6 +23,7 @@ packages/valory/skills/*
 !packages/valory/skills/learning_chained_abci
 !packages/valory/contracts/erc20
 !packages/valory/contracts/oracle
+!packages/valory/contracts/price_keeper
 
 leak_report
 /Pipfile.lock
