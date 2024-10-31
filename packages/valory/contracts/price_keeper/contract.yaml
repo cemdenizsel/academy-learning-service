@@ -1,0 +1,31 @@
+name: price_keeper
+author: valory
+version: 0.1.0
+type: contract
+description: PriceKeeper contract
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  README.md: bafybeihmrczfiyphr5kzjqz3zikfsj2j5dz3rnq6kzc3elvhujpnlqvxhq
+  __init__.py: bafybeihuqgpyvuvihf37lq4d5sp2xaxveza4cbf4y4bexge4ez7folim6i
+  build/PriceKeeper.json: bafybeia4cvdazt4zm6px54772vomkkkw65vkidziai3joxgsm5xsjhiby4
+  contract.py: bafybeif4sdbph3erwsx2kyqro7njfuwexb4xnubixvgcdxs6o6ffmpoy2i
+fingerprint_ignore_patterns: []
+contracts: []
+class_name: PriceKeeper
+contract_interface_paths:
+  ethereum: build/PriceKeeper.json
+dependencies:
+  ecdsa:
+    version: '>=0.15'
+  eth_typing: {}
+  hexbytes: {}
+  open-aea-ledger-ethereum:
+    version: ==1.57.0
+  open-aea-test-autonomy:
+    version: ==0.16.1
+  packaging: {}
+  requests:
+    version: ==2.28.1
+  web3:
+    version: <7,>=6.0.0
