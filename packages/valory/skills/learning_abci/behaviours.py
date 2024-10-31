@@ -891,17 +891,17 @@ class ExerciseTxPreparationBehaviour(
 
         tx_hash_of_price_storage= yield from self.get_store_latest_price_safe_tx_hash(latest_price_of_dai, now)
         print("Latest priced stored in Price Keeper contract, here is the tx: ", tx_hash_of_price_storage)
-        
+
         tx_amount = 1
         # Native transaction (Safe -> recipient)
         if latest_price_of_dai < 1:
             tx_amount = tx_amount + 2 
         else:
             tx_amount = tx_amount + 1
-        tx_hash = yield from self.get_native_transfer_safe_tx_hash(tx_amount)
+        #tx_hash = yield from self.get_native_transfer_safe_tx_hash(tx_amount)
 
         print("tx hash of price storage!!!! : ", tx_hash_of_price_storage)
-        return tx_hash_of_price_storage
+        #return tx_hash_of_price_storage
 
         # # ERC20 transaction (Safe -> recipient)
         # if last_number in [4, 5, 6]:
@@ -909,10 +909,10 @@ class ExerciseTxPreparationBehaviour(
         #     tx_hash = yield from self.get_erc20_transfer_safe_tx_hash()
         #     return tx_hash
 
-        # # Multisend transaction (both native and ERC20) (Safe -> recipient)
-        # self.context.logger.info("Preparing a multisend transaction")
-        # tx_hash = yield from self.get_multisend_safe_tx_hash()
-        # return tx_hash
+        # Multisend transaction (both native and ERC20) (Safe -> recipient)
+        self.context.logger.info("Preparing a multisend transaction")
+        tx_hash = yield from self.get_multisend_safe_tx_hash(tx_amount, latest_dai_price=latest_price_of_dai, timestamp=now)
+        return tx_hash
     
     def get_price_dai_from_oracle(self) -> Generator[None, None, Optional[float]]:
         """Get DAI price"""
@@ -1114,7 +1114,7 @@ class ExerciseTxPreparationBehaviour(
         self.context.logger.info(f"ERC20 transfer data is {data_hex}")
         return data_hex
 
-    def get_multisend_safe_tx_hash(self) -> Generator[None, None, Optional[str]]:
+    def get_multisend_safe_tx_hash(self, amount:int, latest_dai_price:int, timestamp:int) -> Generator[None, None, Optional[str]]:
         """Get a multisend transaction hash"""
         # Step 1: we prepare a list of transactions
         # Step 2: we pack all the transactions in a single one using the mulstisend contract
@@ -1123,7 +1123,7 @@ class ExerciseTxPreparationBehaviour(
         multi_send_txs = []
 
         # Native transfer
-        native_transfer_data = self.get_native_transfer_data()
+        native_transfer_data = self.get_native_transfer_data(amount=amount)
         multi_send_txs.append(
             {
                 "operation": MultiSendOperation.CALL,
@@ -1133,18 +1133,18 @@ class ExerciseTxPreparationBehaviour(
             }
         )
 
-        # ERC20 transfer
-        erc20_transfer_data_hex = yield from self.get_erc20_transfer_data()
+        # store latest price transaction
+        store_latest_price_data_hex = yield from self.store_latest_price_data(latest_dai_price=latest_dai_price, timestamp=timestamp)
 
-        if erc20_transfer_data_hex is None:
+        if store_latest_price_data_hex is None:
             return None
 
         multi_send_txs.append(
             {
                 "operation": MultiSendOperation.CALL,
-                "to": self.params.olas_token_address,
+                "to": self.params.price_keeper_address,
                 "value": ZERO_VALUE,
-                "data": bytes.fromhex(erc20_transfer_data_hex),
+                "data": bytes.fromhex(store_latest_price_data_hex),
             }
         )
 
