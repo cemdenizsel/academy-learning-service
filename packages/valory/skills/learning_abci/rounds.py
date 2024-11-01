@@ -69,6 +69,11 @@ class SynchronizedData(BaseSynchronizedData):
     def price(self) -> Optional[float]:
         """Get the token price."""
         return self.db.get("price", None)
+    
+    @property
+    def value(self) -> Optional[float]:
+        """Get the token price."""
+        return self.db.get("value", None)
 
     @property
     def price_ipfs_hash(self) -> Optional[str]:
@@ -149,7 +154,7 @@ class PullCoinMarketCapRound(CollectSameUntilThresholdRound):
     # and where to store it in the synchronized data. Notice that the order follows the same order
     # from the payload class.
     selection_key = (
-        get_name(SynchronizedData.price),
+        get_name(SynchronizedData.value),
         get_name(SynchronizedData.value_ipfs_hash),
         get_name(SynchronizedData.native_balance),
         get_name(SynchronizedData.erc20_balance),
