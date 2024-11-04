@@ -21,7 +21,10 @@ packages/valory/skills/*
 !packages/valory/services/learning_service
 !packages/valory/skills/learning_abci
 !packages/valory/skills/learning_chained_abci
+!packages/valory/skills/api_call_abci
 !packages/valory/contracts/erc20
+!packages/valory/contracts/oracle
+!packages/valory/contracts/price_keeper
 
 leak_report
 /Pipfile.lock

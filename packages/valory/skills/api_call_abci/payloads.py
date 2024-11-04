@@ -17,7 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 
-"""This module contains the transaction payloads of the LearningAbciApp."""
+"""This module contains the transaction payloads of the ApiCallAbciApp."""
 
 from dataclasses import dataclass
 from typing import Optional
@@ -35,11 +35,11 @@ class DataPullPayload(BaseTxPayload):
     erc20_balance: Optional[float]
 
 @dataclass(frozen=True)
-class PullCoinMarketCapPayload(BaseTxPayload):
+class ApiCallPayload(BaseTxPayload):
     """Represent a transaction payload for the DataPullRound."""
 
     value: Optional[float]
-    value_ipfs_hash: Optional[str]
+    #value_ipfs_hash: Optional[str]
     #native_balance: Optional[float]
     #erc20_balance: Optional[float]
 

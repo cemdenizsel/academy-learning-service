@@ -37,6 +37,8 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    ExerciseTxPreparationPayload,
+    PullCoinMarketCapPayload,
     TxPreparationPayload,
 )
 
@@ -67,11 +69,21 @@ class SynchronizedData(BaseSynchronizedData):
     def price(self) -> Optional[float]:
         """Get the token price."""
         return self.db.get("price", None)
+    
+    @property
+    def value(self) -> Optional[float]:
+        """Get the token price."""
+        return self.db.get("value", None)
 
     @property
     def price_ipfs_hash(self) -> Optional[str]:
         """Get the price_ipfs_hash."""
         return self.db.get("price_ipfs_hash", None)
+    
+    @property
+    def value_ipfs_hash(self) -> Optional[str]:
+        """Get the value_ipfs_hash."""
+        return self.db.get("value_ipfs_hash", None)
 
     @property
     def native_balance(self) -> Optional[float]:
@@ -127,6 +139,29 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class PullCoinMarketCapRound(CollectSameUntilThresholdRound):
+    """DataPullRound"""
+
+    payload_class = PullCoinMarketCapPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+
+    # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
+    collection_key = get_name(SynchronizedData.participant_to_data_round)
+
+    # Selection key specifies how to extract all the different objects from each agent's payload
+    # and where to store it in the synchronized data. Notice that the order follows the same order
+    # from the payload class.
+    selection_key = (
+        get_name(SynchronizedData.value),
+        get_name(SynchronizedData.value_ipfs_hash),
+        get_name(SynchronizedData.native_balance),
+        get_name(SynchronizedData.erc20_balance),
+    )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
 
 class DecisionMakingRound(CollectSameUntilThresholdRound):
     """DecisionMakingRound"""
@@ -168,6 +203,18 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class ExerciseTxPreparationRound(CollectSameUntilThresholdRound):
+    """TxPreparationRound"""
+
+    payload_class = ExerciseTxPreparationPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_tx_round)
+    selection_key = (
+        get_name(SynchronizedData.tx_submitter),
+        get_name(SynchronizedData.most_voted_tx_hash),
+    )
 
 class FinishedDecisionMakingRound(DegenerateRound):
     """FinishedDecisionMakingRound"""
@@ -188,6 +235,11 @@ class LearningAbciApp(AbciApp[Event]):
         DataPullRound: {
             Event.NO_MAJORITY: DataPullRound,
             Event.ROUND_TIMEOUT: DataPullRound,
+            Event.DONE: PullCoinMarketCapRound,
+        },
+        PullCoinMarketCapRound: {
+            Event.NO_MAJORITY: DataPullRound,
+            Event.ROUND_TIMEOUT: DataPullRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
@@ -195,11 +247,16 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
             Event.ERROR: FinishedDecisionMakingRound,
-            Event.TRANSACT: TxPreparationRound,
+            Event.TRANSACT: ExerciseTxPreparationRound,
         },
-        TxPreparationRound: {
-            Event.NO_MAJORITY: TxPreparationRound,
-            Event.ROUND_TIMEOUT: TxPreparationRound,
+        # TxPreparationRound: {
+        #     Event.NO_MAJORITY: TxPreparationRound,
+        #     Event.ROUND_TIMEOUT: TxPreparationRound,
+        #     Event.DONE: FinishedTxPreparationRound,
+        # },
+         ExerciseTxPreparationRound: {
+            Event.NO_MAJORITY: ExerciseTxPreparationRound,
+            Event.ROUND_TIMEOUT: ExerciseTxPreparationRound,
             Event.DONE: FinishedTxPreparationRound,
         },
         FinishedDecisionMakingRound: {},

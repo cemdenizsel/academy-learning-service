@@ -1,0 +1,31 @@
+name: oracle
+author: valory
+version: 0.1.0
+type: contract
+description: Dai Oracle contract
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  README.md: bafybeifkhflcv3c2zmby45ovknbyfsmx4zor2awko63l2ub5yisle6f32i
+  __init__.py: bafybeihxe5t7sgzce3pju4teq4cpvkfemdag7gi3nz263ubkf5zbdx3bty
+  build/oracle.json: bafybeifcof3nlwnfbpxj2bibqzhxbtf3s64qrzf2poeq6s3w4sace6vwba
+  contract.py: bafybeihriiiai7fzn24skbowzy6p3o2exwnuwiz3znjzveyen32mlaxsmi
+fingerprint_ignore_patterns: []
+contracts: []
+class_name: Oracle
+contract_interface_paths:
+  ethereum: build/oracle.json
+dependencies:
+  ecdsa:
+    version: '>=0.15'
+  eth_typing: {}
+  hexbytes: {}
+  open-aea-ledger-ethereum:
+    version: ==1.57.0
+  open-aea-test-autonomy:
+    version: ==0.16.1
+  packaging: {}
+  requests:
+    version: ==2.28.1
+  web3:
+    version: <7,>=6.0.0
