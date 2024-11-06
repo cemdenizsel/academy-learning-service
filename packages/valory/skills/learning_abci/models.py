@@ -50,11 +50,11 @@ class Params(BaseParams):
         self.coingecko_price_template = self._ensure(
             "coingecko_price_template", kwargs, str
         )
-        # self.coinmarketcap_price_template = self._ensure(
-        #     "coinmarketcap_price_template", kwargs, str
-        # )
+    
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
         self.coinmarketcap_api_key = kwargs.get("coinmarketcap_api_key", None)
+        self.arli_api_key = kwargs.get("arli_api_key", None)
+        self.rentcast_api_key = kwargs.get("rentcast_api_key", None)
 
         self.transfer_target_address = self._ensure(
             "transfer_target_address", kwargs, str
@@ -62,6 +62,8 @@ class Params(BaseParams):
         self.olas_token_address = self._ensure("olas_token_address", kwargs, str)
         self.dai_oracle_address = self._ensure("dai_oracle_address", kwargs, str)
         self.price_keeper_address = self._ensure("price_keeper_address", kwargs, str)
+        self.property_registry_address = self._ensure("property_registry_address", kwargs, str)
+
 
         # multisend address is used in other skills, so we cannot pop it using _ensure
         self.multisend_address = kwargs.get("multisend_address", "")
@@ -74,3 +76,9 @@ class CoingeckoSpecs(ApiSpecs):
 
 class CoinmarketcapSpecs(ApiSpecs):
     """A model that wraps ApiSpecs for Coinmarketcap API."""
+
+class ArliSpecs(ApiSpecs):
+    """A model that wraps ApiSpecs for Coinmarketcap API."""
+
+class RentcastSpecs(ApiSpecs):
+    """A model that wraps RentcastSpecs for Rentcast API."""

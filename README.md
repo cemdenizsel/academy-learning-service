@@ -1,7 +1,10 @@
-## Learning Service
+## Real Estate Investment Assistant
 
-A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy](https://github.com/valory-xyz/open-autonomy).
+A service to assist you for your real estate invesments. Giving the desired city, address or region, it retrieves that property data from a Real Estate API and then with the help of LLM models it gives insights if that property is worth investing. If yes, it sends the deposit of this property to house owner and registers itself with the house data into the Property Registry contract. If according to LLM it is not a valuable invesment, then tx does not happen. 
 
+## Flow 
+
+![Alt text](./flow.jpg)
 
 ## System requirements
 
@@ -23,12 +26,13 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
     ```
     git clone git@github.com:valory-xyz/academy-learning-service.git
+    cd academy-learning-service
+    git checkout session8/project
     ```
 
 2. Create the virtual environment:
 
     ```
-    cd academy-learning-service
     poetry shell
     poetry install
     ```
@@ -55,6 +59,8 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
 5. From Tenderly, fund your agents and Safe with some xDAI and OLAS (`0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f`).
 
+6. Deploy the PropertyRegistry contract in `packages/valory/contracts/property_registry/PropertyRegistry.sol` on Gnosis.
+
 6. Make a copy of the env file:
 
     ```
@@ -68,7 +74,9 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 - `TRANSFER_TARGET_ADDRESS`: any random address to send funds to, can be any of the agents for example.
 - `SAFE_CONTRACT_ADDRESS_SINGLE`: the 1 out of 4 agents Safe address.
 - `SAFE_CONTRACT_ADDRESS`: the 3 out of 4 Safe address.
-
+- `COINMARKETCAP_API_KEY`: API KEY for Coinmarketcap.
+- `ARLI_API_KEY`: API KEY for Arli which allows us to choose desired LLM model.
+- `RENTCAST_API_KEY`: API KEY for Rentcast which serves us a huge amount of real estate data.
 
 ### Run a single agent locally
 

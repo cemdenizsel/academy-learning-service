@@ -25,6 +25,7 @@ packages/valory/skills/*
 !packages/valory/contracts/erc20
 !packages/valory/contracts/oracle
 !packages/valory/contracts/price_keeper
+!packages/valory/contracts/property_registry
 
 leak_report
 /Pipfile.lock

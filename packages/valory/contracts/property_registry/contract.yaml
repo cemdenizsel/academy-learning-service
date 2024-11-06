@@ -1,0 +1,32 @@
+name: property_registry
+author: valory
+version: 0.1.0
+type: contract
+description: PropertyRegistry contract
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  PropertyRegistry.sol: bafybeigebrbmsnnm2wwqx2a24nbin2yhfrwqt6lpfiulubt7jyj5miv26i
+  README.md: bafybeih3ylno3iil2hoctgaaicnm2pd5xqha7t6zdvw3563ortp6jmcpmm
+  __init__.py: bafybeiahhklum4vi5ysiyp4gxddraum6jxm73b4cmqbpa4fkqv4yohq7v4
+  build/PropertyRegistry.json: bafybeicfshfm6xgllh6j2x3juk2enmx5gooipyfmpj7tzsstvzcvb23az4
+  contract.py: bafybeib7ejiqoy6duqhe7rwtekewbqppne6qxluznbucznmoxz2gd53nru
+fingerprint_ignore_patterns: []
+contracts: []
+class_name: PropertyRegistry
+contract_interface_paths:
+  ethereum: build/PropertyRegistry.json
+dependencies:
+  ecdsa:
+    version: '>=0.15'
+  eth_typing: {}
+  hexbytes: {}
+  open-aea-ledger-ethereum:
+    version: ==1.57.0
+  open-aea-test-autonomy:
+    version: ==0.16.1
+  packaging: {}
+  requests:
+    version: ==2.28.1
+  web3:
+    version: <7,>=6.0.0

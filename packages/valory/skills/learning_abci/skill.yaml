@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeia66vzh523jnfi63ugiigxsioc7myxkuwvab452nn67ys7gedwydq
+  behaviours.py: bafybeiechwq74lorbgewyt7dbdvirisxesve7t7swbwwluaftqlz7lzg3e
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
   fsm_specification.yaml: bafybeigbbydxuqephdpatb3fp3sxnvr77bfvvo5hwjimxfpgyl32wupe64
   handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeigix3c4lyoeb5e62zc3hsywk4xo7gc5h5zuffs3i5giygaczwwz4i
-  payloads.py: bafybeia3ukcfun6q242ued2hc7n4zhkdyini6zh2vyvzhtcryadirvfbou
-  rounds.py: bafybeie4njdkasvzq6j6j4ijojdfyeirjonxuz2efe74j4gescca4wcy4u
+  models.py: bafybeigyf3ceetdp33cb72rio3nvwf3izpvbyeqbkk5gamxeiupr7nhwcu
+  payloads.py: bafybeie7lzjtqy5xrozc2v4llmchfzyjmqibmmeux2cxqrcromzmzs33pa
+  rounds.py: bafybeibqd2imhqob3tfyk22hx6k5mmb4liivbdw6v42vpqbpzooeenq7am
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
@@ -22,12 +22,13 @@ contracts:
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 - valory/oracle:0.1.0:bafybeielvzh6nshinxbxr4kj4wi56pliiluajopfhpbjy2r3iaml4rlihm
 - valory/price_keeper:0.1.0:bafybeiax5b6np2cvjnrlcdyhikcu66hbucb7hwax3dnefikz52vvgevrcy
+- valory/property_registry:0.1.0:bafybeihahyjp3353vwvfllwbl2jarhnkg2xpgaguf5bj6lbmtzq7i5mvqi
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i
 - valory/ledger_api:1.0.0:bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni
 skills:
-- valory/abstract_round_abci:0.1.0:bafybeiajjzuh6vf23crp55humonknirvv2f4s3dmdlfzch6tc5ow52pcgm
-- valory/transaction_settlement_abci:0.1.0:bafybeielv6eivt2z6nforq43xewl2vmpfwpdu2s2vfogobziljnwsclmlm
+- valory/abstract_round_abci:0.1.0:bafybeidbl64ya57723kxndjoieywamvnhzukosreuraz7bkahyfh4rruiy
+- valory/transaction_settlement_abci:0.1.0:bafybeidx3y7umegud5hvltuy7almakjwhys4v4pl3lzev6o3frtucgydhm
 behaviours:
   main:
     args: {}
@@ -131,11 +132,14 @@ models:
       coingecko_price_template: https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}
       coingecko_api_key: null
       coinmarketcap_api_key: null
+      arli_api_key: null
+      rentcast_api_key: null
       transfer_target_address: '0x0000000000000000000000000000000000000000'
       olas_token_address: '0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f'
       multisend_address: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
       dai_oracle_address: '0x678df3415fc31947dA4324eC63212874be5a82f8'
       price_keeper_address: '0xf8caa9B06000f167f2b5Cb0333CE7152E0560225'
+      property_registry_address: '0xeb9ABc1ED9AA54cd3278851Ccad84fE2b8e9409C'
     class_name: Params
   coingecko_specs:
     args:
@@ -168,6 +172,41 @@ models:
       retries: 5
       url: https://pro-api.coinmarketcap.com/v3/fear-and-greed/latest
     class_name: CoinmarketcapSpecs
+  arli_specs:
+    args:
+      api_id: arli
+      headers:
+        Content-Type: application/json
+        Authorization: null
+      method: POST
+      parameters:
+        model: Llama-3.1-70B-ArliAI-RPMax-v1.2
+        prompt: Given the house price of 1,000,000 euro in Munich for a flat, what
+          would be the price of it after 2 years?
+        repetition_penalty: 1.1
+        temperature: 0.7
+        top_p: 0.9
+        top_k: 40
+        max_tokens: 1024
+        stream: false
+      response_key: choices
+      response_type: list
+      retries: 5
+      url: https://api.arliai.com/v1/completions
+    class_name: ArliSpecs
+  rentcast_specs:
+    args:
+      api_id: rentcast
+      headers:
+        Accept: application/json
+        X-Api-Key: null
+      method: GET
+      parameters:
+        address: 5500 Grand Lake Dr, San Antonio, TX, 78244
+      response_type: list
+      retries: 3
+      url: https://api.rentcast.io/v1/properties
+    class_name: RentcastSpecs
   requests:
     args: {}
     class_name: Requests

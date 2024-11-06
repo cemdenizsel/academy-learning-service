@@ -28,7 +28,9 @@ from packages.valory.skills.abstract_round_abci.tests.data.dummy_abci.models imp
 )
 from packages.valory.skills.learning_abci.models import (
     CoingeckoSpecs as BaseCoingeckoSpecs,
-    CoinmarketcapSpecs as BaseCoinmarketcapSpecs
+    CoinmarketcapSpecs as BaseCoinmarketcapSpecs,
+    ArliSpecs as BaseArliSpecs,
+    RentcastSpecs as BaseRentcastSpecs
 )
 from packages.valory.skills.learning_abci.models import Params as LearningParams
 from packages.valory.skills.learning_abci.models import SharedState as BaseSharedState
@@ -83,3 +85,9 @@ class CoingeckoSpecs(BaseCoingeckoSpecs):
 
 class CoinmarketcapSpecs(BaseCoinmarketcapSpecs):
     """A model that wraps ApiSpecs for Coinmarketcap API."""
+
+class ArliSpecs(BaseArliSpecs):
+    """A model that wraps ApiSpecs for Arli API."""
+
+class RentcastSpecs(BaseRentcastSpecs):
+    """A model that wraps ApiSpecs for Rentcast API."""

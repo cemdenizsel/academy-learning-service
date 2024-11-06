@@ -35,10 +35,9 @@ from packages.valory.skills.abstract_round_abci.base import (
     get_name,
 )
 from packages.valory.skills.learning_abci.payloads import (
-    DataPullPayload,
     DecisionMakingPayload,
     ExerciseTxPreparationPayload,
-    PullCoinMarketCapPayload,
+    HouseDataPayload,
     TxPreparationPayload,
 )
 
@@ -72,7 +71,7 @@ class SynchronizedData(BaseSynchronizedData):
     
     @property
     def value(self) -> Optional[float]:
-        """Get the token price."""
+        """Get the house_data."""
         return self.db.get("value", None)
 
     @property
@@ -84,6 +83,12 @@ class SynchronizedData(BaseSynchronizedData):
     def value_ipfs_hash(self) -> Optional[str]:
         """Get the value_ipfs_hash."""
         return self.db.get("value_ipfs_hash", None)
+    
+    @property
+    def house_data(self) -> Optional[dict]:
+        """Get the house_data."""
+        return self.db.get("house_data", None)
+
 
     @property
     def native_balance(self) -> Optional[float]:
@@ -119,7 +124,7 @@ class SynchronizedData(BaseSynchronizedData):
 class DataPullRound(CollectSameUntilThresholdRound):
     """DataPullRound"""
 
-    payload_class = DataPullPayload
+    payload_class = HouseDataPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
@@ -139,10 +144,10 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
-class PullCoinMarketCapRound(CollectSameUntilThresholdRound):
-    """DataPullRound"""
+class PullRealEstateRound(CollectSameUntilThresholdRound):
+    """PullRealEstateRound"""
 
-    payload_class = PullCoinMarketCapPayload
+    payload_class = HouseDataPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
@@ -154,10 +159,8 @@ class PullCoinMarketCapRound(CollectSameUntilThresholdRound):
     # and where to store it in the synchronized data. Notice that the order follows the same order
     # from the payload class.
     selection_key = (
-        get_name(SynchronizedData.value),
         get_name(SynchronizedData.value_ipfs_hash),
-        get_name(SynchronizedData.native_balance),
-        get_name(SynchronizedData.erc20_balance),
+        get_name(SynchronizedData.house_data)
     )
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
@@ -227,19 +230,19 @@ class FinishedTxPreparationRound(DegenerateRound):
 class LearningAbciApp(AbciApp[Event]):
     """LearningAbciApp"""
 
-    initial_round_cls: AppState = DataPullRound
+    initial_round_cls: AppState = PullRealEstateRound
     initial_states: Set[AppState] = {
-        DataPullRound,
+        PullRealEstateRound,
     }
     transition_function: AbciAppTransitionFunction = {
-        DataPullRound: {
-            Event.NO_MAJORITY: DataPullRound,
-            Event.ROUND_TIMEOUT: DataPullRound,
-            Event.DONE: PullCoinMarketCapRound,
-        },
-        PullCoinMarketCapRound: {
-            Event.NO_MAJORITY: DataPullRound,
-            Event.ROUND_TIMEOUT: DataPullRound,
+        # DataPullRound: {
+        #     Event.NO_MAJORITY: DataPullRound,
+        #     Event.ROUND_TIMEOUT: DataPullRound,
+        #     Event.DONE: PullRealEstateRound,
+        # },
+        PullRealEstateRound: {
+            Event.NO_MAJORITY: PullRealEstateRound,
+            Event.ROUND_TIMEOUT: PullRealEstateRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
@@ -269,7 +272,7 @@ class LearningAbciApp(AbciApp[Event]):
     event_to_timeout: EventToTimeout = {}
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
-        DataPullRound: set(),
+        PullRealEstateRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),
